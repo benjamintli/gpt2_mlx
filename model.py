@@ -1,19 +1,7 @@
-from dataclasses import dataclass
-import math
-
 import mlx.core as mx
 import mlx.nn as nn
 
-
-@dataclass
-class GPTConfig:
-    block_size: int = 1024
-    vocab_size: int = 50304
-    n_layer: int = 12
-    n_head: int = 12
-    n_embd: int = 768
-    dropout: float = 0.0
-    bias: bool = True
+from config import GPTConfig
 
 
 class CausalSelfAttention(nn.Module):
@@ -110,7 +98,6 @@ class GPT(nn.Module):
 
         x = self.ln_f(x)
         return x, kv_cache if build_cache else cache
-
 
     def _create_causal_mask(self, length: int):
         mask = nn.MultiHeadAttention.create_additive_causal_mask(length)

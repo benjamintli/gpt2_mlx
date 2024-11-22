@@ -4,14 +4,8 @@ import time
 import mlx.core as mx
 
 from mlx.utils import tree_unflatten, tree_flatten
-from model import GPT, GPTConfig
-
-GPT_MODELS = {
-    "gpt2": dict(n_layer=12, n_head=12, n_embd=768),
-    "gpt2-medium": dict(n_layer=24, n_head=16, n_embd=1024),
-    "gpt2-large": dict(n_layer=36, n_head=20, n_embd=1280),
-    "gpt2-xl": dict(n_layer=48, n_head=25, n_embd=1600),
-}
+from config import GPTConfig, GPT_MODELS
+from model import GPT
 
 
 def load_weights(gpt_model: GPT, weights: dict):
@@ -51,7 +45,10 @@ def generate_text(prompt: str, model: GPT):
     for token in model.generate(x, max_new_tokens=256):
         tok = token.item()
         tokens.append(tok)
-        print(decode([tok]), end="", flush=True)
+        decoded_token = decode([tok])
+        if (decoded_token == "<|endoftext|>"):
+            break
+        print(decoded_token, end="", flush=True)
     end = time.time()
     print("")
     print("---------------")
@@ -69,7 +66,7 @@ if __name__ == "__main__":
         type=str,
         help="The name of a pre-trained GPT-2 model to use",
         required=True,
-        choices=GPT_MODELS.keys()
+        choices=GPT_MODELS.keys(),
     )
 
     parser.add_argument(
